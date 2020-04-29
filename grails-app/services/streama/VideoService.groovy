@@ -7,13 +7,14 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE
-import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE
 
 @Transactional
 class VideoService {
 
   def fileService
   def uploadService
+  def grailsApplication
+  def settingsService
 
   def deleteVideoAndAssociations(Video video) {
     video.setDeleted(true)
@@ -23,9 +24,10 @@ class VideoService {
   }
 
 
-  public static List<ViewingStatus> listContinueWatching(User currentUser) {
+  public static List<ViewingStatus> listContinueWatching(User currentUser, Profile profile) {
     List<ViewingStatus> continueWatching = ViewingStatus.withCriteria {
       eq("user", currentUser)
+      eq("profile", profile)
       video {
         isNotEmpty("files")
         ne("deleted", true)
@@ -33,8 +35,42 @@ class VideoService {
 //      eq("completed", false)
       order("lastUpdated", "desc")
     }
-    return continueWatching
+
+    return reduceContinueWatchingEps(continueWatching)
   }
+
+  private static List<ViewingStatus> reduceContinueWatchingEps(List<ViewingStatus> continueWatching) {
+    def result = []
+    continueWatching.each { continueWatchingItem ->
+      if (continueWatchingItem.video instanceof Episode) {
+        def previousShowEntry = result.find { it.video instanceof Episode && it.video.show?.id == continueWatchingItem.video.show?.id }
+
+        if (!previousShowEntry) {
+          if(!continueWatchingItem.hasVideoEnded()){
+            result.add(continueWatchingItem)
+          }else{
+            continueWatchingItem.completed = true
+            continueWatchingItem.save()
+            ViewingStatus newViewingStatus = ViewingStatusService.createNewForNextEpisode(continueWatchingItem)
+            if(newViewingStatus){
+              result.add(newViewingStatus)
+            }
+          }
+        }
+      } else{
+        if(!continueWatchingItem.hasVideoEnded()){
+          result.add(continueWatchingItem)
+        }else{
+          continueWatchingItem.completed = true
+          continueWatchingItem.save()
+        }
+      }
+    }
+
+    return result
+  }
+
+
 
 
   @Transactional
@@ -75,6 +111,21 @@ class VideoService {
     file.size = Files.size(givenPath)
     def extensionIndex = params.localFile.lastIndexOf('.')
     file.extension = params.localFile[extensionIndex..-1];
+
+	// Subtitle label guessing (by Norwelian)
+	if(settingsService.getValueForName('guess_subtitle_label')){
+	    def regexConfig = grailsApplication.config.streama?.regex
+		def subtitleNameRegex = regexConfig?.subtitles
+	    def matcher = file.localFile =~ subtitleNameRegex
+		if (matcher.getCount()) {
+			file.subtitleLabel = matcher[0][1].toUpperCase()
+		}
+	}
+
+    if(videoInstance.videoFiles.size() == 0){
+      file.isDefault = true
+    }
+
     file.save(failOnError: true, flush: true)
     videoInstance.addToFiles(file)
     videoInstance.save(failOnError: true, flush: true)
@@ -83,12 +134,17 @@ class VideoService {
 
 
   def listMovies(GrailsParameterMap params, Map options){
-    def max = params.int('max', 50)
-    def offset = params.int('offset', 0)
-    def sort = params.sort
-    def order = params.order
-    def genreId = params.long('genreId')
-    def genreList = params.list('genre')*.toLong()
+    Profile currentProfile = User.getProfileFromRequest()
+    Integer max = params.int('max', 50)
+    Integer offset = params.int('offset', 0)
+    String sort = params.sort
+    String order = params.order
+    Long genreId = params.long('genreId')
+    List<Long> genreList = params.list('genre')*.toLong() ?: []
+
+    if(currentProfile?.isChild){
+      genreList += Genre.findAllByNameInList(['Kids', 'Family'])*.id
+    }
 
     def movieQuery = Movie.where {
       deleted != true
@@ -120,12 +176,17 @@ class VideoService {
 
 
   def listShows(GrailsParameterMap params, Map options){
+    Profile currentProfile = User.getProfileFromRequest()
     def max = params.int('max', 50)
     def offset = params.int('offset', 0)
     def sort = params.sort
     def order = params.order
     def genreId = params.long('genreId')
-    def genreList = params.list('genre')*.toLong()
+    def genreList = params.list('genre')*.toLong() ?: []
+
+    if(currentProfile?.isChild){
+      genreList += Genre.findAllByNameInList(['Kids', 'Family'])*.id
+    }
 
     def tvShowQuery = TvShow.where{
       def tv1 = TvShow

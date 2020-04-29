@@ -59,6 +59,7 @@ angular.module('streama').factory('apiService', function ($http, $rootScope, con
 				return $http.post('user/changePassword.json', data);
 			}
 		},
+
     userActivity: {
       list: function (params) {
         return $http.get('userActivity.json', {params: params});
@@ -221,6 +222,17 @@ angular.module('streama').factory('apiService', function ($http, $rootScope, con
 			}
 		},
 
+    watchlistEntry: {
+      create: function (item) {
+        return $http.post('watchlistEntry/create.json', {params: {id: item.id, mediaType: item.mediaType}});
+      },
+		  delete: function (item) {
+        return $http.delete('watchlistEntry/delete.json', {params: {id: item.id, mediaType: item.mediaType}})
+      },
+      list: function (params) {
+        return $http.get('watchlistEntry/list.json', {params: params});
+      }
+    },
 
 		genres: {
 			get: function (id) {
@@ -230,7 +242,6 @@ angular.module('streama').factory('apiService', function ($http, $rootScope, con
 				return $http.get('genre.json');
 			}
 		},
-
 
     settings: {
 			list: function () {
@@ -243,7 +254,6 @@ angular.module('streama').factory('apiService', function ($http, $rootScope, con
 				return $http.post('settings/validateSettings.json', data);
 			}
 		},
-
 
 		notification: {
 			list: function () {
@@ -268,7 +278,6 @@ angular.module('streama').factory('apiService', function ($http, $rootScope, con
 				return $http.delete('notificationQueue/delete.json', {params: {id: id}});
 			},
 		},
-
 
 		theMovieDb: {
       hasKey: function (params) {
@@ -336,6 +345,22 @@ angular.module('streama').factory('apiService', function ($http, $rootScope, con
 			triggerPlayerAction: function (params) {
 				return $http.get('websocket/triggerPlayerAction.json', {params: params});
 			}
-		}
+		},
+
+    profile: {
+		  save: function (params) {
+        return $http.post('profile/save',  params)
+      },
+		  update: function (params) {
+        return $http.put('profile/update.json',  params)
+      },
+		  delete: function (id) {
+        return $http.delete('profile/delete.json',  {params: {id: id}})
+      },
+      getUserProfiles: function () {
+        return $http.get('profile/getUserProfiles.json')
+      }
+    }
+
 	};
 });

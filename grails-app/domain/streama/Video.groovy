@@ -1,8 +1,10 @@
 package streama
 
-class Video {
+import streama.traits.SimpleInstance
 
-  def springSecurityService
+class Video implements SimpleInstance{
+
+  transient springSecurityService
   transient videoService
 
   Date dateCreated
@@ -23,6 +25,7 @@ class Video {
   String imdb_id
 
   static hasMany = [files: File]
+  static simpleInstanceFields = ['overview', 'poster_path:posterPath', 'title']
 
   static mapping = {
     cache true
@@ -55,16 +58,10 @@ class Video {
 
     Episode episode = (Episode) this
 
-    Video nextEpisode = episode.show.episodes?.find{
-      return (it.episode_number == episode.episode_number+1 && it.season_number == episode.season_number && !it.deleted)
-    }
-    if(!nextEpisode){
-      nextEpisode = episode.show.episodes?.find{
-        return (it.season_number == episode.season_number+1 && it.episode_number == 1 && !it.deleted)
-      }
-    }
+    def allEpisodesForTvShow = episode.show.episodes
+    Video nextEpisode = allEpisodesForTvShow.findAll{it.seasonEpisodeMerged > episode.seasonEpisodeMerged && !it.deleted && it.getVideoFiles()}.min{it.seasonEpisodeMerged}
 
-    if(nextEpisode && nextEpisode.files){
+    if(nextEpisode && nextEpisode.getVideoFiles()){
       return nextEpisode
     }
   }
@@ -81,11 +78,20 @@ class Video {
       return this.show?.name
     }
   }
-  def getVideoFiles(){
-    return this.files?.findAll{it.extension != '.srt' && it.extension != '.vtt'}
+
+  String getFullTitle(){
+    if(this instanceof Episode){
+      return this.episodeString + ' - ' + this.name
+    }else{
+      return this.title + (this.release_date?.substring(0, 4))
+    }
   }
-  def getSubtitles(){
-    return this.files?.findAll{it.extension == '.srt' || it.extension == '.vtt'}
+
+  Set<File> getVideoFiles(){
+    return this.files?.findAll{it.extension != '.srt' && it.extension != '.vtt'} ?: []
+  }
+  Set<File> getSubtitles(){
+    return this.files?.findAll{it.extension == '.srt' || it.extension == '.vtt'} ?: []
   }
 
   def addLocalFile(localFilePath){
@@ -115,28 +121,65 @@ class Video {
   }
 
 
-  def suggestNextVideo(){
-    if (this instanceof Movie) {
+  Video suggestNextVideo(){
+    def result
 
-      Movie tmp_movie=Movie.find{
-        ((id!=this.id) && (genre.id in this.genre.id ) && deleted==this.deleted && id != this.id &&  id > this.id)}
-      if(tmp_movie == null){
-        return Movie.find{ ((id!=this.id) && (genre.id in this.genre.id ) && deleted==this.deleted && id != this.id &&  id < this.id)}?.id
-      }else{
-        return tmp_movie?.id
+    if (this instanceof Movie) {
+      if(!this.genre){
+        return
       }
+      def firstGenre = this.genre?.getAt(0)
+
+      List<Movie> allOtherMovies = Movie.where{
+        id != this.id
+        isNotEmpty("files")
+        deleted != true
+      }.list()
+
+      result = allOtherMovies.max{ it.genre*.id?.intersect(this.genre*.id)?.size()}  //TODO: how big of a performance impact does this have for a large DB? need to test
     }
+
     if (this instanceof Episode) {
       if(this.show?.genre){
         TvShow tmp
         tmp=TvShow.find{ genre.id in (this.show?.genre.id) && id!=this.show.id && id > this.show.id}
         if(tmp == null){
-          return TvShow.find{ genre.id in (this.show?.genre.id) && id!=this.show.id && id < this.show.id}?.getFirstEpisode()?.id
+          result = TvShow.find{ genre.id in (this.show?.genre.id) && id!=this.show.id && id < this.show.id}?.getFirstEpisode()
         }else{
-          return tmp?.getFirstEpisode()?.id
+          result = tmp?.getFirstEpisode()
         }
       }
     }
-    return
+
+    return result
+  }
+
+
+  def getPosterPath(){
+    if(this instanceof Episode){
+      return this.show.poster_path
+    }else{
+      return this.poster_path
+    }
+  }
+
+
+  File getDefaultVideoFile(){
+    def videoFiles = getVideoFiles()
+    if(!videoFiles){
+      return
+    }
+    return videoFiles.find{it.isDefault} ?: videoFiles[0]
+  }
+
+  def inWatchlist(){
+    User currentUser = springSecurityService.currentUser
+    Profile profile = currentUser.getProfileFromRequest()
+    return WatchlistEntry.where{
+      user == currentUser
+      profile == profile
+      isDeleted == false
+      video ==this
+    }.count() > 0
   }
 }

@@ -1,18 +1,25 @@
 //= wrapped
 /**
  * Created by antonia on 14/05/16.
+ *
+ * Last update: 10/02/2020
+ *
  */
 angular.module('streama.translations').config(function ($translateProvider) {
 	$translateProvider.translations('pt', {
 		LOGIN: {
-			TITLE: 'Faça Login',
+			TITLE: 'Fazer Login',
 			USERNAME: 'Usuário',
 			PASSWORD: 'Senha',
 			FIRST_TIME_HINT: 'Primeira vez fazendo login? Tente \'admin\' nos dois campos.',
 			SUBMIT: 'Entrar',
-      SESSION_EXPIRED: 'Sua sessão expirou desde sua última atividade. Por favor faça login novamente.'
+			SESSION_EXPIRED: 'Sua sessão expirou desde sua última atividade. Por favor faça login novamente.'
 		},
 		DASHBOARD: {
+			HOME: 'Início',
+			TV_SHOWS: 'Programas de televisão',
+			MOVIES: 'Filmes',
+			MY_LIST:'Minha lista',
 			TITLE: 'Painel',
 			RECOMMENDATIONS: 'Sugestões para você',
 			NEW_RELEASES: 'Novos lançamentos',
@@ -25,20 +32,23 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			FILTER_BY_TAG: 'Filtrar por Tag...',
 			BROWSE_GENRES: 'Navegar',
 			LOOKING_AT_GENRE: 'Você está vendo o gênero:',
-			MARK_COMPLETED: 'Marca completa',
+			MARK_COMPLETED: 'Concluído',
 			NO_TVSHOWS_FOUND: 'Nenhuma Série Disponível',
-			NO_MOVIES_FOUND: 'Nenhum Filme Disponível'
+			NO_MOVIES_FOUND: 'Nenhum Filme Disponível',
+      NO_WATCHLIST_FOUND: 'Nada aqui ainda',
+			WATCHLIST: 'ver mais tarde'
 		},
 		VIDEO: {
-			RELEASED: 'Lançado',
+			RELEASED: 'Lançamento',
 			IMDB: 'IMDB',
 			RATING: 'Classificação',
 			VOTES: 'Votos',
-			OVERVIEW: 'Visão Geral',
+			OVERVIEW: 'Sinopse',
 			GENRE: 'Gênero',
 			TRAILER: 'Trailer',
 			SEASON: 'Temporada',
-      NO_SUBTITLE: 'Nenhum subtítulo'
+			NO_SUBTITLE: 'Sem legenda',
+			UPNEXT: 'A seguir...'
 		},
 
 		MESSAGES: {
@@ -49,39 +59,54 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			FILE_IN_FS_NOT_FOUND: 'Seu vídeo não pode ser encontrado em nenhum dos locais disponíveis para o aplicativo. Por favor, verifique suas configurações e seus arquivos de sistema para ter certeza de que os arquivos estão acessíveis para o programa.'
 		},
 		MANAGE_CONTENT: 'Gerenciar Conteúdo',
+		MANAGE_SUB_PROFILES: 'Gerenciar perfis',
+		WHOS_WATCHING: 'Quem está assistindo?',
+		ADD_SUB_PROFILE: 'Adicionar perfil',
+		EDIT_BTN: 'Editar',
+		DONE_BTN: 'Concluir',
+		SAVE_BTN: 'Salvar',
+		CREATE_BTN: 'Criar',
+		CANCEL_BTN: 'Cancelar',
+		DELETE_BTN: 'Excluir',
+		ENTER_NAME: 'Digite o nome',
+		EDIT_PROFILE: 'Editar Perfil',
+		CREATE_PROFILE: 'Criar perfil',
 		ADMIN: 'Admin',
 		HELP: 'Ajuda',
 		HELP_FAQ: 'AJUDA / FAQ',
 		PROFILE_SETTINGS: 'Configurações do Perfil',
 		LOGOUT: 'Sair',
-		CHANGE_PASSWORD: 'Mudar Senha',
-		LANGUAGE_en: 'Inglês',
-    LANGUAGE_ru: 'Русский',
-		LANGUAGE_de: 'Alemão',
-		LANGUAGE_fr: 'Francês',
-		LANGUAGE_es: 'Espanhol',
-		LANGUAGE_kr: 'Coreano',
-		LANGUAGE_nl: 'Holandês',
+		CHANGE_PASSWORD: 'Alterar Senha',
+		LANGUAGE_en: 'English/Inglês',
+		LANGUAGE_cn: '中文/Chinês',
+		LANGUAGE_ru: 'Русский/Russo',
+		LANGUAGE_de: 'Deutsch/Alemão',
+		LANGUAGE_fr: 'Français/Francês',
+		LANGUAGE_es: 'Español/Espanhol',
+		LANGUAGE_kr: '한국어/Coreano',
+		LANGUAGE_nl: 'Nederlands/Holandês',
 		LANGUAGE_pt: 'Português',
-    LANGUAGE_ja: 'Japonês',
-    LANGUAGE_it: 'italiano',
-		LANGUAGE_da: 'dinamarquês',
+		LANGUAGE_ja: '日本語/Japonês',
+		LANGUAGE_it: 'Italiano/Italiano',
+		LANGUAGE_da: 'Dansk/Dinamarquês',
+		LANGUAGE_ar: 'عربى/Árabe',
+		LANGUAGE_hu: 'Magyar/Húngaro',
 		PROFIlE: {
 			USERNAME: 'Usuário',
 			FULL_NAME: 'Nome completo',
-			LANGUAGE: 'Linguagem',
+			LANGUAGE: 'Idioma',
 			PAUSE_ON_CLICK: 'Pausar vídeo ao Clicar',
 			FAVORITE_GENRES: 'Gêneros favoritos',
 			SAVE: 'Salvar Perfil',
 			PASS: 'Senha',
-			OLD_PASS: 'Senha Antiga',
-			NEW_PASS: 'Senha Nova',
-			NEW_PASS_PLACEHOLDER: 'Senha Nova (min. 6 caracteres)',
+			OLD_PASS: 'Senha Atual',
+			NEW_PASS: 'Nova Senha',
+			NEW_PASS_PLACEHOLDER: 'Nova Senha (min. 6 caracteres)',
 			REPEAT_PASS: 'Repita a Senha',
 			PASS_ERROR_EMPTY: 'A senha não pode estar vazia',
 			PASS_ERROR_LENGTH: 'A senha tem que ter pelo menos 6 caracteres',
 			PASS_ERROR_REPEAT: 'As senhas têm que coincidir',
-      AMOUNT_OF_MEDIA_ENTRIES: 'Quantidade de Vídeos no Painel de Controle (Antes de "Load More")'
+			AMOUNT_OF_MEDIA_ENTRIES: 'Quantidade de Vídeos no Painel de Controle (Antes de "Load More")'
 		},
 
 		SORT_OPTIONS: {
@@ -132,7 +157,7 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			NOTIFICATIONS: {
 				TITLE: "O que são notificações?",
 				TEXT: "Você pode notificar seus amigos que foram convidados sobre vídeos enviados mandando notificações para eles. Você pode enviar notificações adicionando eles a fila de notificações ao clicar" +
-				" Add Notification button which is in your video's information page and going to the Notifications menu and clicking Send Queue button."
+				" Adicione o botão Notificação, que está na página de informações do seu vídeo, indo até o menu Notificações e clicando no botão Enviar Fila."
 			},
 			VIDEO_PLAYER_SHORTCUTS: {
 				TITLE: "O player tem botões de atalho?",

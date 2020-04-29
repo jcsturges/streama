@@ -7,7 +7,7 @@ angular.module('streama').config(function ($stateProvider) {
 
 		//BASE ROUTES
 		.state('dash', {
-			url: '/dash?genreId?mediaModal?mediaType',
+			url: '/dash?genreId?mediaModal?mediaType?dashType',
 			templateUrl: '/streama/dash.htm',
 			controller: 'dashCtrl as vm',
 			reloadOnSearch: false,
@@ -24,11 +24,16 @@ angular.module('streama').config(function ($stateProvider) {
 				currentUser: resolveCurrentUser
 			}
 		})
+		.state('sub-profiles', {
+			url: '/sub-profiles',
+			templateUrl: '/streama/sub-profiles.htm',
+			controller: 'subProfilesCtrl'
+		})
 
-		.state('profile', {
-			url: '/profile',
-			templateUrl: '/streama/profile.htm',
-			controller: 'profileCtrl',
+		.state('userSettings', {
+			url: '/user-settings',
+			templateUrl: '/streama/user-settings.htm',
+			controller: 'userSettingsCtrl',
 			resolve: {
 				currentUser: resolveCurrentUser
 			}
@@ -147,7 +152,8 @@ angular.module('streama').config(function ($stateProvider) {
 
 
 	function resolveCurrentUser(apiService, $rootScope) {
-		return apiService.currentUser().success(function (data) {
+		return apiService.currentUser().then(function (response) {
+			var data = response.data;
 			if(!data){
 				location.href = '/login/auth'
 			}
@@ -156,7 +162,7 @@ angular.module('streama').config(function ($stateProvider) {
 				$rootScope.currentUser = data;
 				return data;
 			}
-		}).error(function (err, status) {
+		}, function (err, status) {
       if(status === 401){
         location.href = '/login/auth?sessionExpired=true'
       }
@@ -164,7 +170,8 @@ angular.module('streama').config(function ($stateProvider) {
 	}
 
 	function checkPermissionAdmin(apiService, $rootScope, $state) {
-		return apiService.currentUser().success(function (data) {
+		return apiService.currentUser().then(function (response) {
+			var data = response.data;
 			if(!data){
 				location.href = '/login/auth'
 			}
@@ -178,7 +185,8 @@ angular.module('streama').config(function ($stateProvider) {
 	}
 
 	function checkPermission(apiService, $rootScope, $state) {
-		return apiService.currentUser().success(function (data) {
+		return apiService.currentUser().then(function (response) {
+			var data = response.data;
 			if(!data){
 				location.href = '/login/auth'
 			}

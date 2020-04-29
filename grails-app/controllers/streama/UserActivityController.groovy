@@ -1,5 +1,6 @@
 package streama
 
+import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
@@ -9,19 +10,27 @@ class UserActivityController {
 
     def index(Integer max) {
       params.max = Math.min(max ?: 20, 100)
-      params.sort = 'id'
+      params.sort = params.sort ?: 'id'
       params.order = 'DESC'
       params.offset = params.int('offset') ?: 0
 
       def userId = params.long('userId')
 
-      def list = UserActivity.where{
-        if(userId){
-          user{
+      def query = UserActivity.where {
+        if (userId) {
+          user {
             id == userId
           }
         }
-      }.list(params)
-      return [userActivityCount: UserActivity.count(), userActivityList: list]
+        if (params.type == 'login') {
+          type == params.type || type == null
+        } else {
+          type == params.type
+        }
+      }
+
+      def list = query.list(params)
+      Integer count = query.count()
+      return [userActivityCount: count, userActivityList: list]
     }
 }

@@ -125,10 +125,10 @@ class UserController {
     if (userInstance.username == "anonymous") {
       settingsService.changeAnonymousAccess(userInstance.enabled.toString())
     }
-
     userInstance.save flush: true
-
-    UserRole.removeAll(userInstance)
+    UserRole.withNewSession {
+      UserRole.removeAll(userInstance)
+    }
 
     data.authorities?.each { roleJson ->
       Role role = Role.get(roleJson.id)
@@ -161,7 +161,6 @@ class UserController {
     userInstance.save flush: true
 
     UserRole.removeAll(userInstance)
-
     data.authorities?.each { roleJson ->
       Role role = Role.get(roleJson.id)
       UserRole.create(userInstance, role)
@@ -199,7 +198,7 @@ class UserController {
       Genre.findOrCreateByApiId(it.apiId)
     }
 
-    bindData(currentUser, userData, [exclude: ['username', 'password', 'lastUpdated', 'dateCreated']])
+    bindData(currentUser, userData, [exclude: ['username', 'password', 'lastUpdated', 'dateCreated'], include: ['amountOfMediaEntries']])
 
     currentUser.save failOnError: true, flush: true
 
@@ -251,7 +250,7 @@ class UserController {
   }
 
   def loginTarget() {
-    userActivityService.createActivityEntry(request)
+    userActivityService.createActivityEntry(request, 'login')
     redirect(uri: '/')
   }
 

@@ -20,11 +20,23 @@ class ViewingStatusService {
       return [hasError: true, code: NOT_ACCEPTABLE]
     }
 
-    if(video instanceof Episode){
-      viewingStatus = ViewingStatus.findOrCreateByTvShowAndUser(video.show, currentUser)
-      viewingStatus.tvShow = video.show
-    }else{
-      viewingStatus = ViewingStatus.findOrCreateByVideoAndUser(video, currentUser)
+    viewingStatus = ViewingStatus.where{
+      user == currentUser
+      video == video
+      profile == params.profile
+    }.get()
+
+    if(!viewingStatus){
+
+      TvShow show
+
+      if(video.hasProperty('show')){
+        show = video.show
+      }else{
+        show = null
+      }
+
+      viewingStatus = new ViewingStatus(tvShow: show, user: currentUser, video: video, profile: params.profile)
     }
 
     viewingStatus.video = video
@@ -39,6 +51,23 @@ class ViewingStatusService {
     }
 
     viewingStatus.save flush:true
+
+    return viewingStatus
+  }
+
+  static ViewingStatus createNewForNextEpisode(ViewingStatus continueWatchingItem) {
+    Episode nextEpisode = continueWatchingItem.video?.getNextEpisode()
+    if(!nextEpisode){
+      return
+    }
+    ViewingStatus viewingStatus = new ViewingStatus()
+    viewingStatus.runtime = continueWatchingItem.runtime
+    viewingStatus.currentPlayTime = 0
+    viewingStatus.tvShow = continueWatchingItem.tvShow
+    viewingStatus.user = continueWatchingItem.user
+    viewingStatus.profile = continueWatchingItem.profile
+    viewingStatus.video = nextEpisode
+    viewingStatus.save()
 
     return viewingStatus
   }

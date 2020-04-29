@@ -21,8 +21,7 @@ angular.module('streama').factory('mediaListService', function () {
         },
         fetch: endpoint,
         search: search,
-        loadMore: loadMore,
-        getThumbnail: getThumbnail
+        loadMore: loadMore
       };
 
       fetchData(mediaListConfig);
@@ -52,21 +51,6 @@ angular.module('streama').factory('mediaListService', function () {
         mediaListConfig.currentOffset += LIST_MAX;
         fetchData(mediaListConfig);
       }
-
-
-      function getThumbnail(movie) {
-        if(!movie.poster_path && !movie.poster_image_src){
-          return $rootScope.basePath + 'assets/poster-not-found.png';
-        }
-        if(movie.poster_path){
-          return 'https://image.tmdb.org/t/p/w300/' + movie.poster_path;
-        }
-
-        if(movie.poster_image_src){
-          return movie.poster_image_src;
-        }
-
-      }
     }
   };
 
@@ -80,12 +64,13 @@ angular.module('streama').factory('mediaListService', function () {
     };
     angular.extend(params, mediaConfig.filter);
 
-    mediaConfig.fetch(params).success(function (response) {
-      mediaConfig.total = response.total;
+    mediaConfig.fetch(params).then(function (response) {
+      var data = response.data;
+      mediaConfig.total = data.total;
       if(mediaConfig.currentOffset > 0){
-        mediaConfig.list = _.unionBy(mediaConfig.list, response.list, 'id');
+        mediaConfig.list = _.unionBy(mediaConfig.list, data.list, 'id');
       }else{
-        mediaConfig.list = response.list;
+        mediaConfig.list = data.list;
       }
       mediaConfig.isLoading = false;
     });

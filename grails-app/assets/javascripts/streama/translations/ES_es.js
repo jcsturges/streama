@@ -1,6 +1,7 @@
 //= wrapped
 /**
  * Created by antonia on 14/05/16.
+ * Improved translation by @Norwelian on 23/05/19
  */
 angular.module('streama.translations').config(function ($translateProvider) {
 	$translateProvider.translations('es', {
@@ -9,24 +10,30 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			USERNAME: 'Usuario',
 			PASSWORD: 'Contraseña',
 			FIRST_TIME_HINT: '¿Es tu primera vez? Prueba \'admin\' en ambos campos.',
-			SUBMIT: 'Identificarse',
+			SUBMIT: 'Entrar',
       SESSION_EXPIRED: 'Su sesión expiró desde su última actividad. Por favor inicie sesión de nuevo.'
 		},
 		DASHBOARD: {
+      HOME: 'Casa',
+      TV_SHOWS: 'Programas de televisión',
+      MOVIES: 'Películas',
+      MY_LIST:'Mi lista',
 			TITLE: 'Panel de control',
 			NEW_RELEASES: 'Nuevas Publicaciones',
 			CONTINUE_WATCHING: 'Continuar Viendo',
-			DISCOVER_SHOWS: 'Descubrir Shows',
-			DISCOVER_MOVIES: 'Descubrir Películas',
-			DISCOVER_OTHER_VIDEOS: 'Descubrir otros vídeos',
+			DISCOVER_SHOWS: 'Descubre Series',
+			DISCOVER_MOVIES: 'Descubre Películas',
+			DISCOVER_OTHER_VIDEOS: 'Descubre otros vídeos',
 			SORT: 'Ordenar:',
 			SEARCH_BY_NAME: 'Buscar por Nombre...',
 			FILTER_BY_TAG: 'Filtrar por Etiqueta...',
 			BROWSE_GENRES: 'Buscar',
-			LOOKING_AT_GENRE: 'Estás viendo el género:',
-			MARK_COMPLETED: 'Marca Completada',
-			NO_TVSHOWS_FOUND: 'No hay Shows de TV Disponibles',
-			NO_MOVIES_FOUND: 'No hay Películas Disponibles'
+			LOOKING_AT_GENRE: 'Estás explorando el género:',
+			MARK_COMPLETED: 'Marcar como Completado',
+			NO_TVSHOWS_FOUND: 'No se han encontrado Series',
+      NO_WATCHLIST_FOUND: 'Nada aquí todavía',
+			NO_MOVIES_FOUND: 'No se han encontrado Películas',
+      WATCHLIST: 'ver más tarde'
 		},
 		VIDEO: {
 			RELEASED: 'Publicado',
@@ -42,33 +49,48 @@ angular.module('streama.translations').config(function ($translateProvider) {
 
 		MESSAGES: {
 			SHARE_SOCKET: 'Creando una sesión nueva, seras redirigido de vuelta a este reproductor, pero esta vez tendrás un código de sesión único en la URL. ¡Comparte éste enlace con tus amigos para tener una experiencia de visión sincronizada con ellos!',
-			FILE_MISSING: 'Hay un problema con este contenido. Parece que has eliminado el archivo asociado al mismo.',
-			CODEC_PROBLEM: 'Parece que hay un problema añadiendo el archivo de vídeo al reproductor. La causa suele ser debida a un problema con los códecs. Prueba convirtiéndolo a un códec HTML5 compatible, elimina el fichero adjunto, y añádelo de nuevo. Si los códecs son los correctos, comprueba el registro del servidor y la URL en las opciones.',
-			WRONG_BASEPATH: 'Tu vídeo ha sido incluido usando una ruta incorrecta, pero estás accediendo a la página a traves de la ruta "{{basePath}}". Asegúrate de escribir la ruta correcta en las propiedades y de que estás usándola para acceder a la aplicación.',
+			FILE_MISSING: 'Hay un problema con este contenido. Parece el archivo asociado al mismo ha sido eliminado.',
+			CODEC_PROBLEM: 'Parece que hay un problema añadiendo el archivo de vídeo al reproductor. Ésto suele deberse a un problema con los códecs. Prueba convirtiéndolo a un códec compatible con HTML5, elimina el fichero asociado, y añádelo de nuevo. Si los códecs son los correctos, comprueba el log del servidor y la URL base en las opciones.',
+			WRONG_BASEPATH: 'Tu vídeo ha sido incluido usando una ruta incorrecta, pero estás accediendo a la página a traves de la ruta "{{basePath}}". Asegúrate de escribir la ruta correcta en las propiedades y de que estás usándola para acceder a la aplicación.'
 		},
 		MANAGE_CONTENT: 'Gestionar Contenido',
+    MANAGE_SUB_PROFILES: 'Gestionar Perfiles',
+    WHOS_WATCHING: '¿Quién está viendo?',
+    ADD_SUB_PROFILE: 'Añadir perfil',
+    EDIT_BTN: 'Editar',
+    DONE_BTN: 'Hecho',
+    SAVE_BTN: 'Guardar',
+    CREATE_BTN: 'Crear',
+    CANCEL_BTN: 'Cancelar',
+    DELETE_BTN: 'Borrar',
+    ENTER_NAME: 'Ingrese su nombre',
+    EDIT_PROFILE: 'Editar perfil',
+    CREATE_PROFILE: 'Crear perfil',
 		ADMIN: 'Admin',
 		HELP: 'Ayuda',
 		HELP_FAQ: 'Ayuda / Preguntas Frecuentes',
 		PROFILE_SETTINGS: 'Opciones de Perfil',
 		LOGOUT: 'Salir',
 		CHANGE_PASSWORD: 'Cambiar Contraseña',
-		LANGUAGE_en: 'Inglés',
-    LANGUAGE_ru: 'Русский',
-		LANGUAGE_de: 'Alemán',
-		LANGUAGE_fr: 'Francés',
-		LANGUAGE_es: 'Español',
-		LANGUAGE_kr: 'Coreano',
-		LANGUAGE_nl: 'Holandés',
-		LANGUAGE_pt: 'Portugués',
-    LANGUAGE_ja: 'Japonés',
-    LANGUAGE_it: 'Italiano',
-    LANGUAGE_da: 'Danés',
+	LANGUAGE_en: 'English/Inglés',
+	LANGUAGE_cn: 'Chinese/中文',
+    LANGUAGE_ru: 'Русский/Ruso',
+    LANGUAGE_de: 'Deutsch/Alemán',
+    LANGUAGE_fr: 'Français/Francés',
+    LANGUAGE_es: 'Español',
+    LANGUAGE_kr: '한국어/Coreano',
+    LANGUAGE_nl: 'Nederlands/Holandés',
+    LANGUAGE_pt: 'Português/Portugués',
+    LANGUAGE_ja: '日本語/Japonés',
+    LANGUAGE_it: 'Italiano/Italiano',
+    LANGUAGE_da: 'Dansk/Danés',
+    LANGUAGE_ar: 'عربى/Árabe',
+    LANGUAGE_hu: 'Magyar/Húngaro',
 		PROFIlE: {
 			USERNAME: 'Nombre de usuario',
 			FULL_NAME: 'Nombre completo',
 			LANGUAGE: 'Idioma',
-			PAUSE_ON_CLICK: 'Haz click para pausar',
+			PAUSE_ON_CLICK: 'Click en video para pausar',
 			FAVORITE_GENRES: 'Géneros Favoritos',
 			SAVE: 'Guardar Perfil',
 			OLD_PASS: 'Antigua Contraseña',
@@ -76,7 +98,7 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			NEW_PASS_PLACEHOLDER: 'Nueva Contraseña  (min. 6 Caracteres)',
 			REPEAT_PASS: 'Repite tu Contraseña',
 			SAVE_PASS: 'Guardar Nueva Contraseña',
-      AMOUNT_OF_MEDIA_ENTRIES: 'Cantidad de videos en el panel de instrumentos (antes de "Load More")'
+      AMOUNT_OF_MEDIA_ENTRIES: 'Cantidad de videos en la página principal (antes de que aparezca el botón "Cargar Más")'
 		},
 
 		SORT_OPTIONS: {
@@ -87,15 +109,15 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			NEWEST_RELEASED: 'Últimos Publicados',
 			OLDEST_RELEASED: 'Primeros Publicados',
 			NEWEST_AIRED: 'Transmitidos Recientemente',
-			OLDEST_AIRED: 'Transmitidos Primero',
+			OLDEST_AIRED: 'Transmitidos Primero'
 		},
 
 		FAQ: {
 			UPLOAD_VIDEO: {
 				TITLE: '¿Cómo puedo subir un vídeo?',
-				TEXT: "Puedes subir un vídeo accediendo al menú Gestionar Contenido. Elige si quieres subir una Película, un Show de TV o cualquier otro vídeo. Haz click en la opción correspondiente del menú" +
-				" vertical en el lateral izquierdo de la aplicación. Puedes subir un vídeo haciendo click en el botón de Crear Nueva Película/Show de TV/Otro o escribiendo" +
-				" el nombre del vídeo que quieres subir en la barra de búsqueda y seleccionando la película deseada de entre los resultados. Después de eso, puedes elegir rellenar la información del vídeo" +
+				TEXT: "Puedes subir un vídeo accediendo al menú Gestionar Contenido. Elige si quieres subir una Película, una Serie o cualquier otro vídeo. Haz click en la opción correspondiente del menú" +
+				" vertical en el lateral izquierdo de la aplicación. Puedes subir un vídeo haciendo click en el botón de Crear Nueva Película/Serie/Otro o escribiendo" +
+				" el nombre del vídeo que quieres subir en la barra de búsqueda y seleccionando la entrada deseada de entre los resultados. Después de eso, puedes elegir rellenar la información del vídeo" +
 				" manualmente o cargar la información desde TheMovieDB automáticamente. Posteriormente, puedes subir el vídeo y los archivos de subtítulos pulsando sobre el botón Gestionar Archivos."
 			},
 			DELETE_VIDEO: {
@@ -142,7 +164,7 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			USEFUL_LINKS: {
 				TITLE: "Enlaces útiles",
 				TEXT: "Próximamente..."
-			},
+			}
 		}
 	});
 });

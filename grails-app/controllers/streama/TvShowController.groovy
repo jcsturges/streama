@@ -30,7 +30,7 @@ class TvShowController {
       return
     }
 
-    TvShow tvShow
+    TvShow tvShow = TvShow.get(data.id)
 	if(data.apiId != null){
       tvShow = TvShow.findByApiId(data.apiId)
 	}
@@ -40,6 +40,7 @@ class TvShowController {
     }
 
     tvShow.properties = data
+    tvShow.properties.dateCreated = data
     tvShow.deleted = false
 
     if(!tvShow.imdb_id && !data.manualInput){
@@ -54,7 +55,7 @@ class TvShowController {
 
     tvShow.save flush: true
 
-    respond tvShow, [status: CREATED]
+    respond tvShow, [status: (data.id ? OK : CREATED)]
   }
 
   def show(TvShow tvShow) {
@@ -65,7 +66,11 @@ class TvShowController {
 
   def episodesForTvShow(TvShow tvShow) {
     JSON.use('episodesForTvShow') {
-      respond Episode.findAllByShowAndDeletedNotEqual(tvShow, true), [status: OK]
+      def episodes = Episode.where{
+        show == tvShow
+        deleted != true
+      }.list(sort: 'episode_number', order: 'ASC')
+      respond episodes, [status: OK]
     }
   }
 

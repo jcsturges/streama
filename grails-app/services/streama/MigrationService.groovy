@@ -51,6 +51,10 @@ class MigrationService {
         return
       }
 
+      if(!it.name){
+        return
+      }
+
       Genre genre = new Genre()
       genre.name = it.name
       genre.apiId = it.apiId
@@ -141,4 +145,66 @@ class MigrationService {
       setting.save()
     }
   }
+
+  def migrateMergedSeasonEpisode(){
+    List episodes = Episode.where{
+      seasonEpisodeMerged == null
+    }.list()
+
+    episodes.each{ Episode episode ->
+      episode.createMergedSeasonEpisode()
+      episode.save(flush: true)
+    }
+  }
+
+  def setupBasicSubProfiles() {
+    List<User> users = User.where {
+      def currentUser = User
+      not{
+        exists Profile.where {
+          def profile = Profile
+          def profileUser = user
+          currentUser.id == profileUser.id
+        }.id()
+      }
+    }.list()
+
+    users.each { User user ->
+      Profile p = new Profile(
+        user: user,
+        profileName: user.username,
+        profileLanguage: user.language,
+        isChild: false
+      )
+      p.save()
+    }
+  }
+
+  def addProfilesToViewingStatusRecords() {
+    List<User> users = User.where{
+      def currentUser = User
+      exists ViewingStatus.where {
+        def viewingStatus = ViewingStatus
+        def viewingStatusUser = user
+        currentUser.id == viewingStatusUser.id
+      }.id()
+    }.list()
+
+    users.each { User user ->
+      List<ViewingStatus> views = ViewingStatus.findAllByUser(user)
+      if(views.size() == 0) {
+        return
+      }
+
+      views.each { ViewingStatus vs ->
+        if(vs.profile){
+          return
+        }
+        vs.profile = Profile.findByUser(user)
+        vs.save()
+      }
+    }
+  }
+
+
 }

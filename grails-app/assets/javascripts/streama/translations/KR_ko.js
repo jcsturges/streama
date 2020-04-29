@@ -13,6 +13,10 @@ angular.module('streama.translations').config(function ($translateProvider) {
       SESSION_EXPIRED: '마지막 활동 이후 세션이 만료되었습니다. 다시 로그인하십시오.'
 		},
 		DASHBOARD: {
+      HOME: '집',
+      TV_SHOWS: 'TV 프로그램',
+      MOVIES: '영화 산업',
+      MY_LIST:'나의 목록',
 			TITLE: '대시보드',
 			NEW_RELEASES: '신작',
 			CONTINUE_WATCHING: '계속해서 보기',
@@ -26,7 +30,9 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			LOOKING_AT_GENRE: '장르를 보고있습니다.',
 			MARK_COMPLETED: '선택 완료',
 			NO_TVSHOWS_FOUND: '해당 드라마를 찾지 못했습니다.',
-			NO_MOVIES_FOUND: '해당 영화를 찾지 못했습니다.'
+			NO_MOVIES_FOUND: '해당 영화를 찾지 못했습니다.',
+      NO_WATCHLIST_FOUND: '아직 아무것도 없습니다',
+      WATCHLIST: '나중에 볼'
 		},
 		VIDEO: {
 			RELEASED: '출시',
@@ -44,26 +50,41 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			SHARE_SOCKET: '새로운 세션을 만들면 이 플레이어로 다시 돌아오지만, 지금은 URL에 유니크 세션 ID가 있습니다. 세션 ID를 친구들과 공유해서 동시에 시청해보세요!',
 			FILE_MISSING: '비디오 파일이 찾을 수 없습니다. 친구들과 공유해서 동시에 시청해보세요!',
 			CODEC_PROBLEM: '비디오 파일을 플레이어에 추가하는데 문제가 발생했습니다. 코덱의 문제일 가능성이 높습니다. 호환 가능한 HTML5 코덱으로 변경하고, 현재 파일을 삭제하고 다시 추가해보세요. 만약 코덱에 문제가 없다면 환경설정에서 에러 로그와 base URL를 확인해보세요.',
-			WRONG_BASEPATH: '잘못된 경로입니다, 현재 페이지는 "{{basePath}}" 입니다. 올바른 경로로 설정해주세요.',
+			WRONG_BASEPATH: '잘못된 경로입니다, 현재 페이지는 "{{basePath}}" 입니다. 올바른 경로로 설정해주세요.'
 		},
 		MANAGE_CONTENT: '컨텐츠 관리',
+    MANAGE_SUB_PROFILES: '프로필 관리',
+    WHOS_WATCHING: '누가보고있어?',
+    ADD_SUB_PROFILE: '프로필 추가',
+    EDIT_BTN: '편집하다',
+    DONE_BTN: '끝난',
+    SAVE_BTN: '구하다',
+    CREATE_BTN: '몹시 떠들어 대다',
+    CANCEL_BTN: '취소',
+    DELETE_BTN: '지우다',
+    ENTER_NAME: '이름을 입력하시오',
+    EDIT_PROFILE: '프로필 편집',
+    CREATE_PROFILE: '프로필 만들기',
 		ADMIN: '관리자',
 		HELP: '도움',
 		HELP_FAQ: '도움 / 질문',
 		PROFILE_SETTINGS: '프로필 설정',
 		LOGOUT: '로그아웃',
 		CHANGE_PASSWORD: '비밀번호 변경',
-		LANGUAGE_en: '영어',
-    LANGUAGE_ru: 'Русский',
-		LANGUAGE_de: '독일어',
-		LANGUAGE_fr: '프랑스의',
-		LANGUAGE_es: '스페인어',
-		LANGUAGE_kr: '한국어',
-		LANGUAGE_nl: '네덜란드',
-		LANGUAGE_pt: '포르투갈어',
-    LANGUAGE_ja: '일본어',
-    LANGUAGE_it: '이탈리아 사람',
-    LANGUAGE_da: '덴마크 말',
+	LANGUAGE_en: 'English/영어',
+	LANGUAGE_cn: 'Chinese/中文',
+    LANGUAGE_ru: 'Русский/러시아인',
+    LANGUAGE_de: 'Deutsch/독일어',
+    LANGUAGE_fr: 'Français/프랑스의',
+    LANGUAGE_es: 'Español/스페인어',
+    LANGUAGE_kr: '한국어',
+    LANGUAGE_nl: 'Nederlands/네덜란드',
+    LANGUAGE_pt: 'Português/포르투갈어',
+    LANGUAGE_ja: '日本語/일본어',
+    LANGUAGE_it: 'Italiano/이탈리아 사람',
+    LANGUAGE_da: 'Dansk/덴마크 말',
+    LANGUAGE_ar: 'عربى/아라비아 말',
+    LANGUAGE_hu: 'Magyar/헝가리 인',
 		PROFIlE: {
 			USERNAME: '아이디',
 			FULL_NAME: '이름',
@@ -87,7 +108,7 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			NEWEST_RELEASED: '최근 출시된 순 ',
 			OLDEST_RELEASED: '늦게 출시된 순',
 			NEWEST_AIRED: '최근에 방영된 순',
-			OLDEST_AIRED: '늦게 방영된 순 ',
+			OLDEST_AIRED: '늦게 방영된 순 '
 		},
 
 		FAQ: {
@@ -140,7 +161,7 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			USEFUL_LINKS: {
 				TITLE: "유용한 링크",
 				TEXT: "Coming soon..."
-			},
+			}
 		}
 	});
 });

@@ -4,4 +4,10 @@ model {
 	TvShow tvShow
 }
 
-json g.render(tvShow, [deep: true])
+json g.render(tvShow, [deep: true]){
+  mediaType "tvShow"
+	poster_image_src tvShow.poster_image?.src
+	episodesWithFilesCount tvShow.getFilteredEpisodes().findAll{it.files}.size()
+	episodesCount tvShow.getFilteredEpisodes().size()
+  inWatchlist tvShow.inWatchlist()
+}

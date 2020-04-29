@@ -13,6 +13,10 @@ angular.module('streama.translations').config(function ($translateProvider) {
       SESSION_EXPIRED: 'あなたの最後の活動以来あなたのセッションは期限切れです。もう一度ログインしてください。'
 		},
 		DASHBOARD: {
+      HOME: 'ホーム',
+      TV_SHOWS: 'テレビ番組',
+      MOVIES: '映画',
+      MY_LIST:'私のリスト',
 			TITLE: 'ダッシュ ボード',
 			NEW_RELEASES: '新しいリリース',
 			CONTINUE_WATCHING: '続きを見る',
@@ -26,7 +30,9 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			LOOKING_AT_GENRE: 'ジャンルを見てください :',
 			MARK_COMPLETED: '完成品マーク',
 			NO_TVSHOWS_FOUND: 'テレビ番組発見なし',
-			NO_MOVIES_FOUND: 'ない映画'
+			NO_MOVIES_FOUND: 'ない映画',
+      NO_WATCHLIST_FOUND: 'ここにはまだ何もありません',
+      WATCHLIST: '後で見る'
 		},
 		VIDEO: {
 			RELEASED: 'リリース',
@@ -47,23 +53,38 @@ angular.module('streama.translations').config(function ($translateProvider) {
 			WRONG_BASEPATH: 'あなたビデオ取得の間違った基本パスを使用してが \'{{ベースパス}}\' を介してページを拾い読みしています。設定で基本の正しいパスを設定して、あなたがアプリケーションの閲覧に使用していることを確認します。'
 		},
 		MANAGE_CONTENT: 'コンテンツを管理します',
+    MANAGE_SUB_PROFILES: 'プロファイルを管理する',
+    WHOS_WATCHING: '誰が見ている？',
+    ADD_SUB_PROFILE: 'プロフィールを追加',
+    EDIT_BTN: '編集',
+    DONE_BTN: '完了',
+    SAVE_BTN: '保存する',
+    CREATE_BTN: '作成する',
+    CANCEL_BTN: 'キャンセル',
+    DELETE_BTN: '削除',
+    ENTER_NAME: '名前を入力',
+    EDIT_PROFILE: 'プロファイル編集',
+    CREATE_PROFILE: 'プロフィール作成',
 		ADMIN: '管理者',
 		HELP: 'ヘルプ',
 		HELP_FAQ: 'ヘルプ / FAQ',
 		PROFILE_SETTINGS: 'プロファイルの設定',
 		LOGOUT: 'ログアウト',
 		CHANGE_PASSWORD: 'パスワードを変更します',
-		LANGUAGE_en: '英語',
-    LANGUAGE_ru: 'Русский',
-		LANGUAGE_de: 'ドイツ語',
-		LANGUAGE_fr: 'フランス語',
-		LANGUAGE_es: 'スペイン語',
-		LANGUAGE_kr: '韓国語',
-		LANGUAGE_nl: 'オランダ語',
-		LANGUAGE_pt: 'ポルトガル語',
-		LANGUAGE_ja: '日本語',
-    LANGUAGE_it: 'イタリアの',
-
+	LANGUAGE_en: 'English/英語',
+	LANGUAGE_cn: 'Chinese/中文',
+    LANGUAGE_ru: 'Русский/ロシア',
+    LANGUAGE_de: 'Deutsch/ドイツ語',
+    LANGUAGE_fr: 'Français/フランス語',
+    LANGUAGE_es: 'Español/スペイン語',
+    LANGUAGE_kr: '한국어/韓国語',
+    LANGUAGE_nl: 'Nederlands/オランダ語',
+    LANGUAGE_pt: 'Português/ポルトガル語',
+    LANGUAGE_ja: '日本語',
+    LANGUAGE_it: 'Italiano/イタリアの',
+    LANGUAGE_da: 'Dansk/デンマーク語',
+    LANGUAGE_ar: 'عربى/アラビア語',
+		LANGUAGE_hu: 'Magyar/ハンガリー人',
 		PROFIlE: {
 			USERNAME: 'ユーザー名',
 			FULL_NAME: '完全な名前',
@@ -148,4 +169,3 @@ angular.module('streama.translations').config(function ($translateProvider) {
 		}
 	});
 });
-

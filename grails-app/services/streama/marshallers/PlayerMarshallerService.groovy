@@ -2,10 +2,12 @@ package streama.marshallers
 
 import grails.converters.JSON
 import grails.transaction.Transactional
+import org.grails.web.util.WebUtils
 import streama.Episode
 import streama.File
 import streama.GenericVideo
 import streama.Movie
+import streama.Profile
 import streama.Video
 import streama.ViewingStatus
 
@@ -19,6 +21,10 @@ class PlayerMarshallerService {
       cfg.registerObjectMarshaller(Video) { Video video ->
         def returnArray = [:]
 
+        def request = WebUtils.retrieveGrailsWebRequest()?.getCurrentRequest()
+        def profileId = request.getHeader("profileId")
+        Profile profile = Profile.findById(profileId)
+
         returnArray['id'] = video.id
         returnArray['dateCreated'] = video.dateCreated
         returnArray['lastUpdated'] = video.lastUpdated
@@ -31,15 +37,18 @@ class PlayerMarshallerService {
         returnArray['apiId'] = video.apiId
 
         returnArray['files'] = video.files.findAll { it.extension != '.srt' && it.extension != '.vtt' }*.getSimpleInstance()
-        returnArray['subtitles'] = video.files.findAll { it.extension == '.srt' || it.extension == '.vtt' }*.getSimpleInstance()
+        returnArray['videoFiles'] = video.getVideoFiles()*.getSimpleInstance()
+        returnArray['subtitles'] = video.getSubtitles()*.getSimpleInstance()
 
         returnArray['hasFiles'] = video.hasFiles()
 
-        returnArray['viewedStatus'] = ViewingStatus.findByVideoAndUser(video, springSecurityService.currentUser)
+        returnArray['viewedStatus'] = ViewingStatus.findByVideoAndUserAndProfile(video, springSecurityService.currentUser, profile)
+        returnArray['outro_start'] = video.outro_start ? video.outro_start : null
+        returnArray['defaultVideoFile'] = video.getDefaultVideoFile()?.getSimpleInstance()
 
         if (video instanceof Episode) {
           returnArray['mediaType'] = 'episode'
-          returnArray['show'] = video.show?.getSimpleInstance()
+          returnArray['show'] = video.show?.getSimpleInstance(['imdb_id', 'apiId'])
           returnArray['episodeString'] = video.episodeString
           returnArray['name'] = video.name
           returnArray['air_date'] = video.air_date
@@ -48,12 +57,12 @@ class PlayerMarshallerService {
           returnArray['still_path'] = video.buildImagePath('still_path', 1280)
           returnArray['intro_start'] = video.intro_start
           returnArray['intro_end'] = video.intro_end
-          returnArray['outro_start'] = video.outro_start
-          returnArray['nextVideo'] = video.suggestNextVideo()
 
           Video nextEpisode = video.getNextEpisode()
-          if (nextEpisode && nextEpisode.files) {
-            returnArray['nextEpisode'] = [id: nextEpisode?.id]
+          if (nextEpisode && nextEpisode.videoFiles) {
+            returnArray['nextEpisode'] = nextEpisode?.getSimpleInstance()
+          }else{
+            returnArray['nextVideo'] = video.suggestNextVideo()?.getSimpleInstance()
           }
         }
         if (video instanceof Movie) {
@@ -63,7 +72,7 @@ class PlayerMarshallerService {
           returnArray['backdrop_path'] = video.buildImagePath('backdrop_path', 1280)
           returnArray['poster_path'] = video.poster_path
           returnArray['trailerKey'] = video.trailerKey
-          returnArray['nextVideo'] = video.suggestNextVideo()
+          returnArray['nextVideo'] = video.suggestNextVideo()?.getSimpleInstance()
 
         }
         if (video instanceof GenericVideo) {

@@ -9,6 +9,7 @@ class DefaultDataService {
     def roles = [
       [authority: "ROLE_ADMIN", displayName: "Admin"],
       [authority: "ROLE_CONTENT_MANAGER", displayName: "Content Manager"],
+      [authority: "ROLE_TRUSTED_USER", displayName: "Trusted User"],
     ]
 
     roles.each { role ->
@@ -26,7 +27,7 @@ class DefaultDataService {
             password: 'admin',
             fullName: 'Administrator',
             enabled: true,
-            roles: [Role.findByAuthority("ROLE_ADMIN"), Role.findByAuthority("ROLE_CONTENT_MANAGER")]
+            roles: [Role.findByAuthority("ROLE_ADMIN"), Role.findByAuthority("ROLE_CONTENT_MANAGER"),Role.findByAuthority("ROLE_TRUSTED_USER")]
         ]
     ]
 
@@ -155,6 +156,60 @@ class DefaultDataService {
             settingsKey: 'Let users download Videos',
             name: 'player_showDownloadButton',
             description: 'When this value is set to true, the player-interface will get an additional download-button for all users. This will download the raw movie file. ',
+            settingsType: 'boolean',
+            value: 'false',
+            required: false,
+            validationRequired: false
+        ],
+        [
+            settingsKey: 'All Users can download (otherwise only Trusted)',
+            name: 'player_downloadForAllUsers',
+            description: 'If the download feature is enabled, by default only users with the role "Trusted User" can download videos. With this checkmark you can allow all users to download',
+            settingsType: 'boolean',
+            value: 'false',
+            required: false,
+            validationRequired: false
+        ],
+        [
+            settingsKey: 'Hidden Dash sections',
+            name: 'hidden_dash_sections',
+            description: 'You can here add a comma-separted list of all the dash sections you would like to hide. To find out the name, check for vm.isDashSectionHidden(\'SECTION-NAME\'). example value: "continue-watching,new-releases"',
+            settingsType: 'string',
+            value: '',
+            required: false,
+            validationRequired: false
+        ],
+		[
+            settingsKey: 'Guess Subtitle Label',
+            name: 'guess_subtitle_label',
+            description: 'Tries to guess the subtitle label automatically when adding a \'.vtt\' or \'.srt\' file. This is the default behaviour, to change it, change the \'subtitles\' regex in \'application.yml\'',
+            settingsType: 'boolean',
+            value: 'false',
+            required: false,
+            validationRequired: false
+        ],
+		[
+            settingsKey: 'Subtitle Auto Load',
+            name: 'subtitle_auto_load',
+            description: 'Auto loads the first subtitle track on media that has subtitles.',
+            settingsType: 'boolean',
+            value: 'false',
+            required: false,
+            validationRequired: false
+        ],
+		[
+            settingsKey: 'Hide Help/FAQ section',
+            name: 'hide_help_faq',
+            description: 'Determines whether the help/faq section should be displayed for the users',
+            settingsType: 'boolean',
+            value: 'false',
+            required: false,
+            validationRequired: false
+        ],
+		[
+            settingsKey: 'Hide Dashboard Header-links',
+            name: 'hide-dash-sections',
+            description: 'Determines whether the the top Dashboard Links \'Tv Shows\', \'Movies\' and \'My List\' should be hidden',
             settingsType: 'boolean',
             value: 'false',
             required: false,

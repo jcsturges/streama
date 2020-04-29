@@ -3,10 +3,15 @@
 angular.module('streama').controller('modalMediaDetailCtrl', [
   '$scope', '$uibModalInstance', '$rootScope', 'config', '$state', 'apiService',
   function ($scope, $uibModalInstance, $rootScope, config, $state, apiService) {
+    var action;
 
     $scope.mediaType = config.mediaType;
     var mediaId = config.mediaId;
     $scope.isEditButtonHidden = config.isEditButtonHidden;
+
+    $scope.listEpisodesForSeason = listEpisodesForSeason;
+    $scope.addToWatchlist = addToWatchlist;
+    $scope.removeFromWatchlist = removeFromWatchlist;
 
     if(config.mediaObject) {
       $scope.media = config.mediaObject;
@@ -15,19 +20,22 @@ angular.module('streama').controller('modalMediaDetailCtrl', [
     else if(mediaId && $scope.mediaType){
 
       console.log('%c media', 'color: deeppink; font-weight: bold; text-shadow: 0 0 5px deeppink;', mediaId);
-      apiService[$scope.mediaType].get(mediaId).success(function (data) {
+      apiService[$scope.mediaType].get(mediaId).then(function (response) {
+        var data = response.data;
         $scope.media = data;
 
         if($scope.mediaType == 'tvShow'){
           $scope.currentSeason = 0;
-          apiService.tvShow.episodesForTvShow($scope.media.id).success(function (data) {
-            if(data.length){
-              $scope.seasons = _.groupBy(data, 'season_number');
-              $scope.currentSeason = _.min(data, 'season_number').season_number;
+          apiService.tvShow.episodesForTvShow($scope.media.id).then(function (response) {
+            var episodes = $scope.episodes = response.data;
+            if(episodes.length){
+              $scope.seasons = _.chain(episodes).map('season_number').uniq().value();
+              $scope.currentSeason = _.min(episodes, 'season_number').season_number;
             }
           });
-          apiService.dash.firstEpisodeForShow($scope.media.id).success(function (data) {
-            $scope.firstEpisode = data;
+          apiService.dash.firstEpisodeForShow($scope.media.id).then(function (response) {
+            var firstEpisode = response.data;
+            $scope.firstEpisode = firstEpisode;
           });
         }
       });
@@ -36,10 +44,13 @@ angular.module('streama').controller('modalMediaDetailCtrl', [
       alertify.error('No data available');
     }
     $scope.cancel = function () {
-      $uibModalInstance.dismiss('cancel');
+      $uibModalInstance.close({
+        watchlistEntry: $scope.watchlistEntry,
+        video: $scope.media,
+        action: action
+      });
       if($state.current.name === 'dash'){
         $state.go('dash', {mediaModal: null, mediaType: null});
-
       }
 	};
 	$scope.setCurrentSeason = function (index) {
@@ -64,4 +75,30 @@ angular.module('streama').controller('modalMediaDetailCtrl', [
 		$scope.$on('$stateChangeStart', function () {
 			$uibModalInstance.dismiss('cancel');
 		});
+
+    function listEpisodesForSeason(seasonNum) {
+      return _.filter($scope.episodes, {'season_number': seasonNum});
+    }
+
+    function addToWatchlist(item) {
+      apiService.watchlistEntry.create(item).then(function (response) {
+        var data = response.data;
+        $scope.media = data.video ? data.video : data.tvShow;
+        $scope.watchlistEntry = data;
+        action = 'added'
+      });
+    }
+
+    function removeFromWatchlist(item) {
+      alertify.set({buttonReverse: true, labels: {ok: "Yes", cancel: "Cancel"}});
+      alertify.confirm("Are you sure you want to remove this video from your watchlist?", function (confirmed) {
+        if (confirmed) {
+          apiService.watchlistEntry.delete(item).then(function (response) {
+            var data = response.data;
+            $scope.media = data;
+            action = 'removed'
+          });
+        }
+      })
+    }
 }]);

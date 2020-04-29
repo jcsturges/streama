@@ -4,6 +4,7 @@ import streama.traits.SimpleInstance
 
 class TvShow implements SimpleInstance {
 
+  transient springSecurityService
   transient theMovieDbService
 
 
@@ -44,8 +45,8 @@ class TvShow implements SimpleInstance {
       overview size: 1..5000
   }
 
-  def getFilteredEpisodes(){
-    def filteredEpisodes = Episode.findAllByShowAndDeletedNotEqual(this, true)
+  List<Episode> getFilteredEpisodes(){
+    List filteredEpisodes = Episode.findAllByShowAndDeletedNotEqual(this, true)
     return filteredEpisodes
   }
 
@@ -71,21 +72,19 @@ class TvShow implements SimpleInstance {
     }
   }
 
+  def inWatchlist(){
+    User currentUser = springSecurityService.currentUser
+    Profile profile = currentUser.getProfileFromRequest()
+    return WatchlistEntry.where{
+      user == currentUser
+      profile == profile
+      tvShow == this
+      isDeleted == false
+    }.count() > 0
+  }
+
 
   def getFirstEpisode(){
-    Episode firstEpisode = this.episodes?.find{it.files && it.season_number != "0"}
-
-    this.episodes.each{ Episode episode ->
-      if((episode.season_number == firstEpisode?.season_number) && (episode.episode_number < firstEpisode?.episode_number) && episode.files){
-        firstEpisode = episode
-      }
-      else if(episode.season_number < firstEpisode?.season_number && episode.files && episode.season_number != "0"){
-        firstEpisode = episode
-      }
-    }
-
-    if(firstEpisode && firstEpisode.files){
-      return firstEpisode
-    }
+    return this.episodes?.findAll{it.files && it.season_number != "0"}.min{it.seasonEpisodeMerged}
   }
 }

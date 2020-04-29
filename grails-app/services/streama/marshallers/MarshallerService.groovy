@@ -14,6 +14,7 @@ import streama.TvShow
 import streama.User
 import streama.Video
 import streama.ViewingStatus
+import streama.WatchlistEntry
 
 @Transactional
 class MarshallerService {
@@ -46,7 +47,6 @@ class MarshallerService {
       return returnArray
     }
 
-
     JSON.registerObjectMarshaller(User) { User user ->
       def returnArray = [:]
 
@@ -61,6 +61,7 @@ class MarshallerService {
       returnArray['favoriteGenres'] = user.favoriteGenres
       returnArray['isAdmin'] = (user.authorities.find{it.authority == 'ROLE_ADMIN'} ? true : false)
       returnArray['isContentManager'] = (user.authorities.find{it.authority == 'ROLE_CONTENT_MANAGER'} ? true : false)
+      returnArray['isTrustedUser'] = (user.authorities.find{it.authority == 'ROLE_TRUSTED_USER'} ? true : false)
       returnArray['pauseVideoOnClick'] = user.pauseVideoOnClick
 
       if(user.invitationSent && user.uuid){
@@ -132,6 +133,7 @@ class MarshallerService {
 
       returnArray['hasFiles'] = movie.hasFiles()
 
+      returnArray['inWatchlist'] = movie.inWatchlist()
 //            returnArray['viewedStatus'] = ViewingStatus.findByVideoAndUser(movie, springSecurityService.currentUser)
 
       return returnArray;
@@ -166,6 +168,7 @@ class MarshallerService {
       returnArray['genre'] = genericVideo.genre
       returnArray['hasFiles'] = genericVideo.hasFiles()
 
+      returnArray['inWatchlist'] = genericVideo.inWatchlist()
 
       return returnArray;
     }
@@ -195,11 +198,12 @@ class MarshallerService {
       returnArray['hasFiles'] = tvShow.getHasFiles()
       returnArray['firstEpisode'] = mediaService.getFirstEpisode(tvShow)
 
+      returnArray['inWatchlist'] = tvShow.inWatchlist()
+
 //            returnArray['viewedStatus'] = ViewingStatus.findByVideoAndUser(movie, springSecurityService.currentUser)
 
       return returnArray;
     }
-
 
     JSON.createNamedConfig('fullShow') {  cfg ->
       cfg.registerObjectMarshaller(TvShow) { TvShow  tvShow ->
@@ -229,7 +233,6 @@ class MarshallerService {
       }
     }
 
-
     JSON.createNamedConfig('dashViewingStatus') {  cfg ->
       cfg.registerObjectMarshaller(ViewingStatus) { ViewingStatus  viewingStatus ->
         def returnArray = [:]
@@ -255,6 +258,7 @@ class MarshallerService {
         returnArray['vote_count'] = video.vote_count
         returnArray['popularity'] = video.popularity
         returnArray['original_language'] = video.original_language
+        returnArray['inWatchlist'] = video.inWatchlist()
 
         if(video instanceof Movie){
           returnArray['title'] = video.title
@@ -284,8 +288,6 @@ class MarshallerService {
         return returnArray;
       }
     }
-
-
 
     JSON.createNamedConfig('firstEpisode') {  cfg ->
       cfg.registerObjectMarshaller(Episode) { Episode  episode ->
@@ -353,6 +355,7 @@ class MarshallerService {
         returnArray['tags'] = movie.tags
         returnArray['genre'] = movie.genre
         returnArray['poster_image_src'] = movie.poster_image?.src
+        returnArray['inWatchlist'] = movie.inWatchlist()
 
         return returnArray;
       }
@@ -381,6 +384,7 @@ class MarshallerService {
         returnArray['manualInput'] = tvShow.manualInput
         returnArray['poster_image_src'] = tvShow.poster_image?.src
         returnArray['genre'] = tvShow.genre
+        returnArray['inWatchlist'] = tvShow.inWatchlist()
 
         return returnArray;
       }
@@ -412,11 +416,25 @@ class MarshallerService {
 
         returnArray['tags'] = genericVideo.tags
         returnArray['genre'] = genericVideo.genre
+        returnArray['inWatchlist'] = genericVideo.inWatchlist()
 
         return returnArray;
       }
     }
 
+    JSON.createNamedConfig('watchlist') { cfg ->
+      cfg.registerObjectMarshaller(WatchlistEntry) { WatchlistEntry watchlistEntry ->
+        def response = [:]
+        response['id'] = watchlistEntry.id
+        response['dateCreated'] = watchlistEntry.dateCreated
+        response['lastUpdated'] = watchlistEntry.lastUpdated
+
+        response['tvShow'] = watchlistEntry.tvShow
+        response['video'] = watchlistEntry.video
+        return response;
+      }
+
+    }
 
     JSON.createNamedConfig('fullMovie') {  cfg ->
       cfg.registerObjectMarshaller(Movie) { Movie  movie ->
@@ -453,13 +471,13 @@ class MarshallerService {
 
 
         returnArray['hasFiles'] = movie.hasFiles()
+        returnArray['inWatchlist'] = movie.inWatchlist()
 //        returnArray['externalSubtitleUrl'] = movie.externalSubtitleUrl
 //        returnArray['externalVideoUrl'] = movie.externalVideoUrl
 
         return returnArray;
       }
     }
-
 
     JSON.createNamedConfig('adminFileManager') {  cfg ->
       cfg.registerObjectMarshaller(File) { File  file ->
@@ -535,17 +553,25 @@ class MarshallerService {
         returnArray['name'] = episode.name
         returnArray['season_number'] = episode.season_number
         returnArray['episode_number'] = episode.episode_number
-        returnArray['hasFile'] = episode.files?.size()
+        returnArray['hasFile'] = episode.getVideoFiles()?.size()
         returnArray['still_path'] = episode.still_path
         returnArray['intro_start'] = episode.intro_start
         returnArray['intro_end'] = episode.intro_end
         returnArray['outro_start'] = episode.outro_start
         returnArray['videoType'] = 'episode'
         returnArray['still_image_src'] = episode.still_image?.src
+        returnArray['videoFiles'] = episode.getVideoFiles()?.collect{it.simpleInstance}
 
+        ViewingStatus viewingStatus = episode.getViewingStatus()
+        if(viewingStatus){
+          returnArray['isInProgress'] = true
+          returnArray['currentPlayTime'] = viewingStatus.currentPlayTime
+          returnArray['runtime'] = viewingStatus.runtime
+        }
         return returnArray;
       }
     }
+
     JSON.createNamedConfig('adminEpisodesForTvShow') {  cfg ->
       cfg.registerObjectMarshaller(Episode) { Episode  episode ->
         def returnArray = [:]
@@ -557,6 +583,7 @@ class MarshallerService {
         returnArray['episode_number'] = episode.episode_number
         returnArray['files'] = episode.videoFiles?.collect{it.simpleInstance}
         returnArray['subtitles'] = episode.subtitles?.collect{it.simpleInstance}
+        returnArray['videoFiles'] = episode.getVideoFiles()?.collect{it.simpleInstance}
         returnArray['still_path'] = episode.still_path
         returnArray['intro_start'] = episode.intro_start
         returnArray['intro_end'] = episode.intro_end

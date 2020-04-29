@@ -11,12 +11,13 @@ class DashController {
 
   def listContinueWatching(){
     User currentUser = springSecurityService.currentUser
+    Long profileId = request.getHeader('profileId')?.toLong()
+    Profile profile = Profile.findById(profileId)
 
-    List<ViewingStatus> viewingStatusList = videoService.listContinueWatching(currentUser)
+    List<ViewingStatus> viewingStatusList = videoService.listContinueWatching(currentUser, profile)
 
     return [viewingStatusList: viewingStatusList]
   }
-
 
   def listShows(){
     JSON.use ('dashTvShow') {
@@ -24,12 +25,9 @@ class DashController {
     }
   }
 
-
   def listEpisodesForShow(TvShow tvShow){
     respond tvShow.getFilteredEpisodes()
   }
-
-
 
   def listRecommendations(){
     User currentUser = springSecurityService.currentUser
@@ -61,7 +59,6 @@ class DashController {
     }
   }
 
-
   def firstEpisodeForShow(TvShow tvShow){
     Episode firstEpisode = tvShow.firstEpisode
     if(firstEpisode){
@@ -77,16 +74,19 @@ class DashController {
     }
   }
 
-
   def listGenericVideos(){
-    def genreId = params.long('genreId')
+    List<Long> genreIds = params.list('genreId')*.toLong() ?: []
+    Profile currentProfile = User.getProfileFromRequest()
+    if(currentProfile?.isChild){
+      genreIds += Genre.findAllByNameInList(['Kids', 'Family'])*.id
+    }
 
     def genericVideoQuery = GenericVideo.where {
       deleted != true
       isNotEmpty("files")
-      if(genreId){
+      if(genreIds){
         genre{
-          id == genreId
+          id in genreIds
         }
       }
     }
@@ -105,17 +105,23 @@ class DashController {
 
   def searchMedia() {
     String query = params.query
-    def movies = Movie.findAllByDeletedNotEqual(true)
-    def shows = TvShow.findAllByDeletedNotEqual(true)
 
+    def movies = Movie.where{
+      deleted != true
+      title =~ "%${query}%"
+    }.list()
+
+    def tvShows = TvShow.where{
+      deleted != true
+      name =~ "%${query}%"
+    }.list()
 
     def result = [
-        shows:shows.findAll{it.name.toLowerCase().contains(query.toLowerCase())},
-        movies:movies.findAll{it.title.toLowerCase().contains(query.toLowerCase())}
+        shows: tvShows,
+        movies: movies
     ]
     respond result
   }
-
 
   def listGenres(){
     def genres = Genre.list()
@@ -129,11 +135,35 @@ class DashController {
   }
 
   def listNewReleases(){
+    List<Long> genreIds
+    Profile currentProfile = User.getProfileFromRequest()
+    if(currentProfile?.isChild){
+      genreIds = Genre.findAllByNameInList(['Kids', 'Family'])*.id
+    }
+    List<NotificationQueue> newReleasesList = NotificationQueue.where{
+      type == 'newRelease'
+
+      if(genreIds){
+        or{
+          tvShow{
+            genre{
+              'in'('id', genreIds)
+            }
+          }
+          movie{
+            genre{
+              'in'('id', genreIds)
+            }
+          }
+        }
+      }
+    }.list()
+    newReleasesList = newReleasesList.sort { new Random(System.nanoTime()) }
+
     JSON.use('dashMovies'){
-      respond NotificationQueue.findAllByType('newRelease').sort{new Random(System.nanoTime())}
+      respond newReleasesList
     }
   }
-
 
   def mediaDetail(){
     log.debug(params.mediaType)
@@ -163,8 +193,7 @@ class DashController {
     }
   }
 
-
-  def cotinueWatching(TvShow tvShow){
+  def continueWatching(TvShow tvShow){
     def result
 
     if(!tvShow){
@@ -200,4 +229,5 @@ class DashController {
     }.deleteAll()
     render "OK"
   }
+
 }
